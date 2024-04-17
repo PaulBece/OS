@@ -52,12 +52,7 @@ int main(void)
                         sendMessage(151515,0606,num,childpid);
                     }
                     else{
-                        if (num%2) {
-                            sendMessage(101010,0660,num,childpid);
-                        }
-                        else {
-                            sendMessage(101010,0660,num,childpid);
-                        }
+                        sendMessage(101010,0660,num,childpid);                        
                     }
                 }
                 exit(0);
@@ -79,12 +74,7 @@ int main(void)
                         sendMessage(151515,0606,num,childpid);
                     }
                     else{
-                        if (num%2) {
-                            sendMessage(101010,0660,num,childpid);
-                        }
-                        else {
-                            sendMessage(101010,0660,num,childpid);
-                        }
+                        sendMessage(101010,0660,num,childpid);    
                     }
                 }
                 exit(0);
