@@ -25,11 +25,11 @@ struct sembuf v = {0, +1, SEM_UNDO};
 
 int main()
 {
-    int shmid,shmid2;
-    key_t key,key2;
-    char *shm,*shm2;
+    int shmid,shmid2,shmid3;
+    key_t key,key2,key3;
+    char *shm,*shm2,*shm3;
 
-    key = 5678; key2=8765;
+    key = 5678; key2=8765; key3=4567;
 
     if ((shmid = shmget(key, SHMSZ, IPC_CREAT | 0666)) < 0) {
         perror("shmget");
@@ -37,6 +37,11 @@ int main()
     }
 
     if ((shmid2 = shmget(key2, SHMSZ, IPC_CREAT | 0666)) < 0) {
+        perror("shmget");
+        exit(1);
+    }
+
+    if ((shmid3 = shmget(key3, SHMSZ, IPC_CREAT | 0666)) < 0) {
         perror("shmget");
         exit(1);
     }
@@ -51,10 +56,13 @@ int main()
         exit(1);
     }
 
+    if ((shm3 = shmat(shmid3, NULL, 0)) == (char *) -1) {
+        perror("shmat");
+        exit(1);
+    }
 
     *shm = '0';
-    int pos=0;
-
+    sprintf(shm3,"0\0");
 
     int id = semget(KEY, 1, 0666 | IPC_CREAT);
     if (id < 0)
@@ -81,10 +89,10 @@ int main()
             exit(13);
         }
         if (*shm=='0'){
-
+            int pos=atoi(shm3);
             shm2[pos++]=s[i];
             shm2[pos++]=s[i];
-            pos+=2;
+            sprintf(shm3,"%d\0",pos);
             *shm='1';
         }
         else i--;
@@ -95,5 +103,4 @@ int main()
             exit(14);
         }
     }
-    shm2[pos]=NULL;
 }
