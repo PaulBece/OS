@@ -1,12 +1,28 @@
-/*
- * shm-client - client program to demonstrate shared memory.
- */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
+#include <sys/sem.h>
+#include <errno.h>
 #include <sys/shm.h>
-#include <stdio.h>
 
+#define KEY 0x1111
 #define SHMSZ     27
+
+union semun
+{
+    int val;
+    struct semid_ds *buf;
+    unsigned short *array;
+};
+
+
+
+struct sembuf p = {0, -1, SEM_UNDO};
+struct sembuf v = {0, +1, SEM_UNDO};
 
 main()
 {
@@ -41,13 +57,40 @@ main()
     }
     *last=NULL;
     sprintf(shm,"%d\0",num);
+
+    int id = semget(KEY, 1, 0666 | IPC_CREAT);
+    if (id < 0)
+    {
+        perror("semget");
+        exit(11);
+    }
+    union semun u;
+    u.val = 1;
+    if (semctl(id, 0, SETVAL, u) < 0)
+    {
+        perror("semctl");
+        exit(12);
+    }
+
+
     while (c<100){
         if (strcmp(last,shm)!=0){
+
+            if (semop(id, &p, 1) < 0) {
+            perror("semop p");
+            exit(13);
+            }
             sprintf(shm,"%d\0",num++);
             strncpy(last,shm,20);
             last[20]='\0';
             printf("%s\n",shm);
             c++;
+            
+            if (semop(id, &v, 1) < 0)
+            {
+                perror("semop p");
+                exit(14);
+            }
         }
     }
 
