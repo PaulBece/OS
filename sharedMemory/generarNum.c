@@ -66,7 +66,7 @@ int main()
         exit(1);
     }
     *last='\0';
-    //sprintf(shm,"%d\0",num);
+    sprintf(shm,"%d\0",num);
 
     int id = semget(KEY, 1, 0666 | IPC_CREAT);
     if (id < 0)
